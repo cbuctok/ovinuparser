@@ -1,10 +1,18 @@
 library(rvest)
+# library(RPostgreSQL)
+
+url_makers <- "https://www.ovinu.si/vinarji"
+
+links_makers <- read_html(url_makers) %>%
+  html_nodes(".odd")
+
 
 url <- "https://www.ovinu.si/vinar/%d"
 winery_catalog <- list()
+
 for (i in 1:166){
   curr_url <- sprintf(url, i)
-  winepage <- read_html(url)
+  winepage <- read_html(curr_url)
 
   name <- winepage %>%
     html_node("h2") %>%
@@ -32,4 +40,4 @@ for (i in 1:166){
   winery_catalog[[i]] <- winery
 }
 
-write.csv(winery_catalog, file = "MyData.csv")
+winery_catalog
