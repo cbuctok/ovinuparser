@@ -1,0 +1,36 @@
+---
+title: "Winebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook I use for studing R.
+
+There's no reason for this language to exist but man how good is everything about it (except some horrible limitations).
+
+After some time I understood that it was made to keep one category of people away from the world and be comfortable in their dreamland. Let's have a peek what's going on there. Be prepared - it is beautiful and makes no sense!
+
+# Dataset
+
+I collected it via scraping wich was fun.
+
+Also I wrote some scripts, boring ones are not going to be explained nor shown.
+
+```{r}
+source('main.R')
+```
+
+# Simple tables
+
+## Wine colour popularity in Slovenia
+
+```{r}
+barve()
+```
+
+
+## Temperature vs Colour
+
+```{r}
+serving_comb()
+```
+

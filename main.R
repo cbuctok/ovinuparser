@@ -6,7 +6,9 @@ if (file.exists(file_wines)) {
 
 barve <- function() {
   counts <- table(wines$Colour)
-  barplot(counts, main = 'Barve')
+  barplot(counts,
+          main = 'Colours',
+          col = c('yellow', 'red', 'pink'))
 }
 
 regije <- function() {
@@ -23,7 +25,7 @@ serving_comb <- function() {
   counts <- table(wines$Colour, wines$ServingTemperature)
   barplot(
     counts,
-    main = 'Temperature vs Colour',
+    main = 'Serving Temperature vs Colour',
     legend = rownames(counts),
     col = c('yellow', 'red', 'pink')
   )
