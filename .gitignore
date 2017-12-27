@@ -1,9 +1,10 @@
 .RData
 .Rhistory
-.Rproj.user/
 *~
-ovinu.Rproj
-.Rproj.user
+*.Rproj
+*.user
 *.csv
 vin*/
 vinarji
+*.svg
+*.html

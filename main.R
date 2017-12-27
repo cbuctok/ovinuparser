@@ -56,3 +56,29 @@ alcohol <- function() {
   counts <- table(wines$Alcohol)
   barplot(counts, main = 'Alko')
 }
+
+winery_prod <- function() {
+
+  fivemakers <- sort(table(wines$Winery), decreasing = TRUE)[1:5]
+  counts <- table(wines$Colour, wines$Winery)
+  fivecounts <- counts[,names(fivemakers)]
+  
+  op <- par(mar=c(1,7,4,2))
+  barplot(counts,
+          main = 'Production',
+          legend = rownames(counts),
+          col = c('yellow', 'red', 'pink'),
+          cex.names=0.3,
+          las = 1,
+          horiz = T
+  )
+  
+  op <- par(mar=c(10,2,1,1))
+  barplot(fivecounts,
+          main = 'Top five',
+          legend = rownames(counts),
+          col = c('yellow', 'red', 'pink'),
+          las = 2
+  )
+  rm(op)
+}

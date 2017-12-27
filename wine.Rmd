@@ -34,3 +34,11 @@ barve()
 serving_comb()
 ```
 
+## Winery
+
+Wich winery produces what (by colour).
+
+```{r}
+winery_prod()
+```
+
