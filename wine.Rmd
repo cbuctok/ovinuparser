@@ -16,7 +16,7 @@ I collected it via scraping wich was fun.
 Also I wrote some scripts, boring ones are not going to be explained nor shown.
 
 ```{r}
-source('main.R')
+source('functions.R')
 ```
 
 # Simple tables
@@ -24,14 +24,22 @@ source('main.R')
 ## Wine colour popularity in Slovenia
 
 ```{r}
-barve()
+counts <- table(wines$Colour)
+barplot(counts,
+        main = 'Colours',
+        col = c('yellow', 'red', 'pink'))
 ```
 
 
 ## Temperature vs Colour
 
 ```{r}
-serving_comb()
+counts <- table(wines$Colour, wines$ServingTemperature)
+barplot(
+  counts,
+  main = 'Serving Temperature vs Colour',
+  legend = rownames(counts),
+  col = c('yellow', 'red', 'pink'))
 ```
 
 ## Winery
@@ -39,6 +47,151 @@ serving_comb()
 Wich winery produces what (by colour).
 
 ```{r}
-winery_prod()
+fivemakers <- sort(table(wines$Winery), decreasing = T)[1:5]
+counts <- table(wines$Colour, wines$Winery)
+fivecounts <- counts[,names(fivemakers)]
+
+op <- par(mar=c(2,7,2,0))
+barplot(counts,
+        main = 'Production',
+        legend = rownames(counts),
+        col = c('yellow', 'red', 'pink'),
+        cex.names=0.3,
+        las = 1,
+        horiz = T
+)
+op <- par(mar=c(2,13,1,0))
+barplot(fivecounts,
+        main = 'Top five',
+        legend = rownames(counts),
+        col = c('yellow', 'red', 'pink'),
+        las = 1,
+        horiz = T,
+        args.legend = list(x = 'center'))
+rm(op, fivecounts, fivemakers)
 ```
 
+## Amfora
+
+```{r}
+l <- list()
+ii <- c('amfora', 'barik', 'beton', 'jekl', 'les', 'stekl')
+lbls <- c('Amphora', 'Barrique', 'Beton', 'Aluminium', 'Wooden Barrel', 'Glass Bottles')
+for (i in ii) {
+  l[i] <- nrow(selektor('Maturation', i))
+}
+counts <- unlist(l)
+pct <- round(counts/sum(counts)*100)
+lbls <- paste(lbls, pct)
+lbls <- paste(lbls,"%",sep="")
+pie(unlist(l),
+    main = 'Maturation',
+    labels = lbls,
+    col = rainbow(length(l)))
+rm(l, i, ii, pct, lbls)
+```
+
+## When to drink wines
+
+```{r}
+n = 0
+drinkable_years <- list()
+for (i in seq_along(wines$Years)) {
+  drinkable_period <- 0
+  x <- wines$Years[i]
+  m <- gregexpr('[0-9]{4}', x)
+  regma <- regmatches(x, m)
+  if (!is.na(regma[[1]][1])) {
+    yearx <- regma[[1]]
+    l <- length(yearx)
+    if ( l > 1) {
+      drinkable_period <- yearx[l-1]:yearx[l]
+    } else {
+      drinkable_period <- yearx[l]
+    }
+  }
+  for (k in drinkable_period) {
+    n = n + 1
+    if (k != 0){
+    drinkable_years[[n]] <- k
+    } else {
+      drinkable_years[[n]] <- 2017
+    }
+  }
+}
+counts <- table(unlist(drinkable_years))
+barplot(counts,
+        main = 'When to drink',
+        las = 2)
+plot(counts, type = 'b', xlab = 'Years', ylab = 'Drinkable wines')
+rm(n, drinkable_years, i, k, regma, yearx, l, x, m, drinkable_period)
+```
+## Top 10 Varietals (100%)
+
+```{r}
+counts <- sort(sort(table(wines$Variety), decreasing = T)[1:10])
+op <- par(mar=c(2,11,2,0))
+barplot(counts,
+        main = 'Top Ten Varietals',
+        col = rainbow(10),
+        horiz = T,
+        las = 1)
+rm(op)
+
+l <- list()
+for (i in trimws(tolower(wines$Variety))) {
+  if (!length(grep('zvrst|%', i))) {
+    l[i] <- mean_price_var(i)
+  }
+}
+op <- par(mar = c(2, 11, 1, 1))
+barplot(
+  sort(sort(unlist(l), decreasing = T)[1:10]),
+  main = 'Most Expensive Varietals',
+  col = rainbow(10),
+  horiz = T,
+  las = 1
+)
+rm(op, i, l)
+```
+
+# Wine taste chart
+
+```{r}
+minprice <- 0
+mintmp <- 2
+minalc <- 10
+
+wineswpr <-
+  subset(wines,
+         wines$Price > minprice &
+           wines$ServingTemperature > mintmp)
+cena <- wineswpr$Price
+tmp <- wineswpr$ServingTemperature
+x <- wineswpr$Colour
+scatterplot(
+  tmp ~ cena | x,
+  data = wineswpr,
+  labels = row.names(wineswpr),
+  legend.title = 'Colour',
+  legend.coords = 'bottomright',
+  xlab = 'Price',
+  ylab = 'Serving Temperature'
+)
+
+wineswpr <-
+  subset(wines, wines$Price > minprice & wines$Alcohol > minalc)
+cena <- wineswpr$Price
+tmp <- wineswpr$Alcohol
+colour <- wineswpr$Colour
+scatterplot(
+  tmp ~ cena | colour,
+  data = wineswpr,
+  labels = row.names(wineswpr),
+  legend.title = 'Colour',
+  legend.coords = 'bottomright',
+  xlab = 'Price',
+  ylab = 'Amount of alhohol'
+)
+rm(minprice, mintmp, minalc, wineswpr, cena, tmp, colour, x)
+```

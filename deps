@@ -2,4 +2,4 @@ Fedora:
 openssl-devel libssh2-devel libcurl-devel libpqxx-devel
 
 R:
-devtools rvest lintr xml2 DBI RPostgreSQL
+devtools rvest lintr xml2 DBI RPostgreSQL sqldf

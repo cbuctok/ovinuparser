@@ -8,3 +8,5 @@ vin*/
 vinarji
 *.svg
 *.html
+.Rproj.user
+*.sqlite
