@@ -5,13 +5,16 @@ library(sqldf)
 library(car)
 
 wload <- function() {
+  temp <- tempfile()
+  archive <- 'wine.zip'
   file_wines <- 'all_wines.csv'
-  if (file.exists(file_wines)) {
-    wines <- read.csv(file_wines)
+  if (file.exists(archive)) {
+    wines <- read.csv(unz(archive, file_wines))
     print('Loaded all wines')
   } else {
     stop('NO FILE FOUND!')
   }
+  unlink(temp)
   rm(file_wines)
   wines
 }

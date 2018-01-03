@@ -31,9 +31,3 @@ alcohol <- function() {
   counts <- table(wines$Alcohol)
   barplot(counts, main = 'Alko')
 }
-
-maturation <- function() {
-  
-}
-
-
