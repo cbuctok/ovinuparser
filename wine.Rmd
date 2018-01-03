@@ -17,6 +17,7 @@ Also I wrote some scripts, boring ones are not going to be explained nor shown.
 
 ```{r}
 source('functions.R')
+wc <- c('White', 'Red', 'Rosé')
 ```
 
 # Simple tables
@@ -25,9 +26,11 @@ source('functions.R')
 
 ```{r}
 counts <- table(wines$Colour)
+names(counts) <- wc
 barplot(counts,
         main = 'Colours',
-        col = c('yellow', 'red', 'pink'))
+        col = c('yellow', 'red', 'pink'),
+        las = 1)
 ```
 
 
@@ -38,8 +41,11 @@ counts <- table(wines$Colour, wines$ServingTemperature)
 barplot(
   counts,
   main = 'Serving Temperature vs Colour',
-  legend = rownames(counts),
-  col = c('yellow', 'red', 'pink'))
+  legend = wc,
+  col = c('yellow', 'red', 'pink'),
+  las = 1,
+  xlab = 'Temperature °C',
+  ylab = 'Number of Wines')
 ```
 
 ## Winery
@@ -54,16 +60,17 @@ fivecounts <- counts[,names(fivemakers)]
 op <- par(mar=c(2,7,2,0))
 barplot(counts,
         main = 'Production',
-        legend = rownames(counts),
+        legend = wc,
         col = c('yellow', 'red', 'pink'),
         cex.names=0.3,
         las = 1,
-        horiz = T
+        horiz = T,
+        xlab = 'Labels'
 )
 op <- par(mar=c(2,13,1,0))
 barplot(fivecounts,
         main = 'Top five',
-        legend = rownames(counts),
+        legend = wc,
         col = c('yellow', 'red', 'pink'),
         las = 1,
         horiz = T,
@@ -176,7 +183,8 @@ scatterplot(
   legend.title = 'Colour',
   legend.coords = 'bottomright',
   xlab = 'Price',
-  ylab = 'Serving Temperature'
+  ylab = 'Serving Temperature',
+  las = 1
 )
 
 wineswpr <-
@@ -191,7 +199,8 @@ scatterplot(
   legend.title = 'Colour',
   legend.coords = 'bottomright',
   xlab = 'Price',
-  ylab = 'Amount of alhohol'
+  ylab = 'Amount of alhohol',
+  las = 1
 )
 rm(minprice, mintmp, minalc, wineswpr, cena, tmp, colour, x)
 ```
