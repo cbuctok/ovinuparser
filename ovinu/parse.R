@@ -1,6 +1,13 @@
+library(xml2)
 library(curl)
 library(rvest)
+library(parallel)
 
+no_cores <- detectCores() - 1
+cl <- makeCluster(no_cores, type = 'FORK')
+stopCluster(cl)
+
+setwd("~/git/ovinu/ovinu")
 WEBPAGE = 'https://www.ovinu.si'
 
 get_html <- function(url = 'https://www.ovinu.si/vinar/166') {
@@ -176,18 +183,22 @@ prepare_csv <- function() {
   csv_wineries <- data.frame()
   csv_wines <- data.frame()
   wineries <- parse_wineries()
-  
-  for (i in seq_along(wineries)) {
-    print(sprintf('i=%d', i))
+  all_wineries <- nrow(wineries)
+  for (i in seq_len(nrow(wineries))) {
+    nowat <-sprintf('i=%d, %f%%',
+                    i,
+                    ((i/all_wineries)*100))
     print(wineries[i, 'URL'])
     url_winery <- wineries[i, 'URL']
     winery <- parse_winery(url = url_winery)
     csv_wineries <- rbind(csv_wineries, winery)
     wines <- parse_wines(url = url_winery)
-    
-    for (k in seq_along(wines)) {
-      print(sprintf('k=%d',
-                    k))
+    all_wines <- nrow(wines)
+    for (k in seq_len(nrow(wines))) {
+      print(sprintf('%s k=%d %f%%',
+                    nowat,
+                    k,
+                    ((k/all_wines)*100)))
       print(wines[k, 2])
       if (nrow(wines) != 0) {
         wine <- parse_wine(wines[k, 2])
