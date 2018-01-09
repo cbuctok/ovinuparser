@@ -178,22 +178,6 @@ parse_wine <- function(url = '/vino/1302') {
   df
 }
 
-
-actu_parse <- function(i) {
-  url_winery <- wineries[i, 'URL']
-  winery <- parse_winery(url = url_winery)
-  csv_wineries <- rbind(csv_wineries, winery)
-  wines <- parse_wines(url = url_winery)
-  all_wines <- nrow(wines)
-  for (k in seq_len(nrow(wines))) {
-    if (nrow(wines) != 0) {
-      wine <- parse_wine(wines[k, 2])
-      csv_wines <- rbind(csv_wines, wine)
-    }
-  }
-  csv_wines
-}
-
 prepare_csv <- function() {
   print('Start!')
   csv_wineries <- data.frame()
@@ -202,7 +186,7 @@ prepare_csv <- function() {
   all_wineries <- nrow(wineries)
   
   no_cores <- detectCores() - 1
-  cl <- makeCluster(no_cores, outfile = "debug.txt")
+  cl <- makeCluster(no_cores)
   registerDoParallel(cl)
   
   df <- data.frame(
@@ -224,29 +208,44 @@ prepare_csv <- function() {
     Maturation = character()
   )
   
-  csv_wines <- foreach(
-    l = seq_len(nrow(wineries)),
+  csvs <- foreach (
+    i = seq_len(nrow(wineries)),
     .export = c(
-      "actu_parse",
       "get_html",
       "parse_wine",
       "parse_wineries",
       "parse_winery",
       "parse_wines",
       "prepare_csv",
-      'wineries',
-      'WEBPAGE',
-      'csv_wineries',
-      'csv_wines'
+      'WEBPAGE'
     ),
-    .packages = c('rvest', 'xml2'),
-    .combine = rbind.data.frame
+    .packages = c('rvest', 'xml2')
   ) %dopar%
   {
-    actu_parse(l)
+    url_winery <- wineries[i, 'URL']
+    winery <- parse_winery(url = url_winery)
+    csv_wineries <- rbind(csv_wineries, winery)
+    wines <- parse_wines(url = url_winery)
+    all_wines <- nrow(wines)
+    for (k in seq_len(nrow(wines))) {
+      if (nrow(wines) != 0) {
+        wine <- parse_wine(wines[k, 2])
+        csv_wines <- rbind(csv_wines, wine)
+      }
+    }
+    list(csv_wineries, csv_wines)
   }
+  
   stopCluster(cl)
   
-  #write.csv(csv_wineries, 'all_wineries.csv')
-  write.csv(csv_wines, 'all_wines.csv')
+  all_wines <- data.frame()
+  all_wineries <- data.frame()
+  
+  for(i in seq_along(csvs)) {
+    all_wineries <- rbind(all_wineries, data.frame(csvs[[i]][[1]]))
+    all_wines <- rbind(all_wines, data.frame(csvs[[i]][[2]]))
+  }
+
+  write.csv(unique(all_wineries), 'all_wineries.csv')
+  write.csv(unique(all_wines), 'all_wines.csv')
 }
